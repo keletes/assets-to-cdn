@@ -9,6 +9,12 @@ fi
 export AWS_ACCESS_KEY_ID=$S3_ACCESS_KEY
 export AWS_SECRET_ACCESS_KEY=$S3_SECRET
 
+if [ -n "$STARTUP_DELAY" ]; then
+	echo "Delaying startup for $STARTUP_DELAY seconds..."
+	sleep "$STARTUP_DELAY"
+	echo "Resuming startup"
+fi
+
 folder=""
 if [ "$SUBFOLDERS" ]; then
 	dirs=$(echo $SUBFOLDERS | tr "," "\n")
@@ -19,16 +25,20 @@ else
 	folder="$BASE_MOUNT"
 fi
 
-args="$folder"
+if [ -n "$STARTUP_SYNC" ]; then
+	echo "First synchronization"
+	args="$folder"
 
-if [ "$EXCLUDE" ]; then
-	exts=$(echo $EXCLUDE | tr "," "\n")
-	for ext in $exts; do
-		args="$args ! -name '*.$ext'"
-	done
+	if [ "$EXCLUDE" ]; then
+		exts=$(echo $EXCLUDE | tr "," "\n")
+		for ext in $exts; do
+			args="$args ! -name '*.$ext'"
+		done
+	fi
+
+	eval "find $args" | sh ./files-to-cdn.sh
 fi
 
-eval "find $args" | sh ./files-to-cdn.sh
 
 args="-1rl 5"
 
