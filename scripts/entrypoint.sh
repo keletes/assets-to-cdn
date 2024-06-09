@@ -17,8 +17,10 @@ fi
 
 folder=""
 if [ "$SUBFOLDERS" ]; then
+	echo "Watching the following folders:"
 	dirs=$(echo $SUBFOLDERS | tr "," "\n")
 	for dir in $dirs; do
+		echo $dir
 		folder="$folder $BASE_MOUNT/$dir"
 	done
 else
@@ -26,7 +28,6 @@ else
 fi
 
 if [ -n "$STARTUP_SYNC" ]; then
-	echo "First synchronization"
 	args="$folder"
 
 	if [ "$EXCLUDE" ]; then
@@ -35,8 +36,9 @@ if [ -n "$STARTUP_SYNC" ]; then
 			args="$args ! -name '*.$ext'"
 		done
 	fi
-
+	echo "Starting first synchronization..."
 	eval "find $args" | sh ./files-to-cdn.sh
+	echo "First synchronization finished."
 fi
 
 
