@@ -30,12 +30,6 @@ fi
 if [ -n "$STARTUP_SYNC" ]; then
 	args="$folder"
 
-	if [ "$EXCLUDE" ]; then
-		exts=$(echo $EXCLUDE | tr "," "\n")
-		for ext in $exts; do
-			args="$args ! -name '*.$ext'"
-		done
-	fi
 	echo "Starting first synchronization..."
 	eval "find $args" | sh ./files-to-cdn.sh
 	echo "First synchronization finished."
@@ -43,13 +37,6 @@ fi
 
 
 args="-1rl 5"
-
-if [ "$EXCLUDE" ]; then
-	extensions=$(echo $EXCLUDE | tr "," "\n")
-	for extension in $extensions; do
-		args="$args -e '\.$extension$'"
-	done
-fi
 
 args="$args $folder"
 while true; do
